@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Logo设计 | 作品集</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Noto+Sans+SC:wght@300;400;500;700;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+
+<div class="progress-bar" id="progressBar"></div>
+
+<div class="sub-nav">
+  <button class="back-btn" onclick="window.location.href='index.html'">&larr; 返回主页</button>
+  <div class="sub-nav-title" id="pageTitle">Logo设计</div>
+  <button class="upload-btn" id="uploadBtn">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="width:18px;height:18px">
+      <path d="M12 4v12m-5-7l5-5 5 5M4 20h16" stroke-linecap="round" stroke-linejoin="round"/>
+    </svg>
+    <span>上传作品</span>
+  </button>
+</div>
+
+<input type="file" id="fileInput" multiple style="display:none">
+
+<section style="padding-top:120px">
+  <div class="section-header reveal">
+    <div class="section-num" id="sectionNum">04 / WORK</div>
+    <h2 class="section-title">Logo <span class="accent">设计</span></h2>
+    <p class="section-desc" id="pageDesc"></p>
+  </div>
+  <div class="divider"></div>
+
+  <div class="upload-section reveal">
+    <div class="upload-section-header">
+      <div class="upload-section-title">新增上传 <span class="badge" id="uploadCount">0</span></div>
+      <div class="upload-hint" id="uploadHint"></div>
+    </div>
+    <div class="drop-zone" id="dropZone">
+      <div class="drop-icon">&#11014;</div>
+      <div class="drop-text">点击或拖拽文件到此处 <strong>上传作品</strong></div>
+    </div>
+    <div class="upload-grid" id="uploadGrid"></div>
+    <div class="upload-empty" id="uploadEmpty">暂无上传作品，点击上方按钮上传</div>
+  </div>
+
+  <div id="contentGrid"></div>
+</section>
+
+<footer>
+  <div class="footer-logo">PORT<span>FOLIO</span></div>
+  <p>&copy; 2026 Creative Portfolio. All Rights Reserved.</p>
+</footer>
+
+<div class="lightbox" id="lightbox">
+  <div class="lb-close" onclick="closeLightbox()">&times;</div>
+  <div class="lb-counter" id="lbCounter"></div>
+  <div class="lb-nav lb-prev" onclick="navLightbox(-1)">&#8249;</div>
+  <img id="lbImg" src="" alt="">
+  <div class="lb-nav lb-next" onclick="navLightbox(1)">&#8250;</div>
+  <div class="lb-caption" id="lbCaption"></div>
+</div>
+
+<script src="assets/app.js"></script>
+<script>
+renderLogo();
+initCommon();
+initSubPage('logo');
+</script>
+</body>
+</html>

@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>创意作品集 | Creative Portfolio</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Noto+Sans+SC:wght@300;400;500;700;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+
+<div class="progress-bar" id="progressBar"></div>
+
+<nav>
+  <a href="index.html" class="logo">PORT<span>FOLIO</span></a>
+  <ul id="navMenu">
+    <li><a href="video.html">视频制作</a></li>
+    <li><a href="print.html">平面物料</a></li>
+    <li><a href="ui.html">界面设计</a></li>
+    <li><a href="logo.html">Logo设计</a></li>
+  </ul>
+  <button class="nav-toggle" id="navToggle"><span></span><span></span><span></span></button>
+</nav>
+
+<section class="hero">
+  <div class="hero-bg">
+    <div class="orb"></div>
+    <div class="orb"></div>
+    <div class="orb"></div>
+  </div>
+  <div class="tagline">CREATIVE PORTFOLIO</div>
+  <h1>视觉 <span class="gradient-text">创意</span> 作品集</h1>
+  <p class="subtitle">汇聚品牌标识、界面设计、视频影像与平面物料的多元化创意表达</p>
+  <div class="hero-meta">
+    <div class="meta-item"><div class="meta-num">04</div><div class="meta-label">CREATIVE FIELDS</div></div>
+    <div class="meta-item"><div class="meta-num">50+</div><div class="meta-label">WORKS SHOWCASE</div></div>
+    <div class="meta-item"><div class="meta-num">02</div><div class="meta-label">VIDEO PRODUCTIONS</div></div>
+  </div>
+  <div class="scroll-indicator"><div class="mouse"></div></div>
+</section>
+
+<section style="padding-top:40px">
+  <div class="section-header reveal">
+    <div class="section-num">PORTFOLIO</div>
+    <h2 class="section-title">作品 <span class="accent">分类</span></h2>
+    <p class="section-desc">点击进入对应板块，查看完整作品并上传你的创作</p>
+  </div>
+  <div class="divider"></div>
+
+  <div class="hub-cards reveal">
+    <a href="video.html" class="hub-card">
+      <div class="hub-num">01</div>
+      <div class="hub-icon">▶</div>
+      <div class="hub-title">视频 制作</div>
+      <div class="hub-desc">企业宣传视频与项目影像内容的创意策划与制作，支持页面内直接播放</div>
+      <div class="hub-meta"><span>2 件作品 · 2 个视频</span><span class="arrow">&rarr;</span></div>
+    </a>
+
+    <a href="print.html" class="hub-card">
+      <div class="hub-num">02</div>
+      <div class="hub-icon">◆</div>
+      <div class="hub-title">平面 物料</div>
+      <div class="hub-desc">品牌主视觉、企业宣传、活动物料与节日海报的全品类设计输出</div>
+      <div class="hub-meta"><span>42 件作品 · 6 个分类</span><span class="arrow">&rarr;</span></div>
+    </a>
+
+    <a href="ui.html" class="hub-card">
+      <div class="hub-num">03</div>
+      <div class="hub-icon">▣</div>
+      <div class="hub-title">界面 设计</div>
+      <div class="hub-desc">涵盖官网页面、管理系统与产品平台的界面视觉设计，注重用户体验与交互</div>
+      <div class="hub-meta"><span>7 件作品 · 3 个项目</span><span class="arrow">&rarr;</span></div>
+    </a>
+
+    <a href="logo.html" class="hub-card">
+      <div class="hub-num">04</div>
+      <div class="hub-icon">◈</div>
+      <div class="hub-title">Logo 设计</div>
+      <div class="hub-desc">品牌标识设计，涵盖标志创作与视觉应用规范，构建品牌核心视觉识别</div>
+      <div class="hub-meta"><span>4 件作品</span><span class="arrow">&rarr;</span></div>
+    </a>
+  </div>
+</section>
+
+<footer>
+  <div class="footer-logo">PORT<span>FOLIO</span></div>
+  <p>&copy; 2026 Creative Portfolio. All Rights Reserved.</p>
+</footer>
+
+<div class="lightbox" id="lightbox">
+  <div class="lb-close" onclick="closeLightbox()">&times;</div>
+  <div class="lb-counter" id="lbCounter"></div>
+  <div class="lb-nav lb-prev" onclick="navLightbox(-1)">&#8249;</div>
+  <img id="lbImg" src="" alt="">
+  <div class="lb-nav lb-next" onclick="navLightbox(1)">&#8250;</div>
+  <div class="lb-caption" id="lbCaption"></div>
+</div>
+
+<script src="assets/app.js"></script>
+<script>
+initCommon();
+
+document.querySelectorAll('.hub-card').forEach(card => {
+  card.addEventListener('mousemove', (e) => {
+    const rect = card.getBoundingClientRect();
+    const x = ((e.clientX - rect.left) / rect.width * 100).toFixed(1);
+    const y = ((e.clientY - rect.top) / rect.height * 100).toFixed(1);
+    card.style.setProperty('--mx', x + '%');
+    card.style.setProperty('--my', y + '%');
+  });
+});
+</script>
+</body>
+</html>
