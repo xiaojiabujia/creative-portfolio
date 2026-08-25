@@ -18,13 +18,12 @@ function autoSubcategory(cat, file) {
     return '其他视频';
   }
   if (cat === 'print') {
-    if (/主视觉|背景|banner|会展/.test(name)) return '品牌主视觉';
-    if (/京能/.test(name)) return '京能项目';
-    if (/折页|简介|快报|数字分身/.test(name)) return '企业宣传';
-    if (/立牌|工作会|联欢|活动/.test(name)) return '活动物料';
-    if (/节日|海报|圣诞|冬至|立冬|跨年/.test(name)) return '节日海报';
-    if (/流言|漫画/.test(name)) return '流言榜项目';
-    return '其他物料';
+    if (/易拉宝/.test(name)) return '易拉宝';
+    if (/海报|节日|圣诞|冬至|立冬|跨年|流言|漫画/.test(name)) return '海报';
+    if (/折页|简介|快报/.test(name)) return '折页';
+    if (/主视觉|背景|banner|会展|京能|安心|体验站/.test(name)) return '主视觉';
+    if (/展板|立牌|工作会|联欢|数字分身|活动/.test(name)) return '展板';
+    return '海报';
   }
   if (cat === 'ui') {
     if (/招聘/.test(name)) return '官网招聘页面';
@@ -40,6 +39,25 @@ function autoSubcategory(cat, file) {
 }
 
 const CAT_LABELS = { video: '视频制作', print: '平面物料', ui: '界面设计', logo: 'Logo设计' };
+
+const SUBCATEGORIES = {
+  video: ['企业宣传', '产品介绍', '其他视频'],
+  print: ['易拉宝', '海报', '折页', '主视觉', '展板'],
+  ui: ['官网招聘页面', '智能检修管理系统', '词元工厂界面设计', '其他界面'],
+  logo: ['标志设计', 'Logo应用'],
+};
+
+function populateSubcatSelect(selectEl, cat, selected) {
+  if (!selectEl) return;
+  selectEl.innerHTML = '';
+  (SUBCATEGORIES[cat] || ['其他']).forEach(s => {
+    const opt = document.createElement('option');
+    opt.value = s;
+    opt.textContent = s;
+    if (s === selected) opt.selected = true;
+    selectEl.appendChild(opt);
+  });
+}
 
 const PORTFOLIO_DATA = {
   logo: [
@@ -68,26 +86,22 @@ const PORTFOLIO_DATA = {
     { type: 'video', src: '视频制作/帮手产品介绍20260824.mp4', title: '帮手产品介绍', duration: '产品视频' },
   ],
   print: [
-    { project: '品牌主视觉', images: [
+    { project: '主视觉', images: [
       { src: '平面物料/主视觉16：9文件 拷贝.png', title: '主视觉 16:9' },
       { src: '平面物料/大厅主视觉背景 拷贝.png', title: '大厅主视觉背景' },
       { src: '平面物料/会展背景图.png', title: '会展背景图' },
       { src: '平面物料/官网banner图.png', title: '官网Banner' },
-    ]},
-    { project: '京能项目', images: [
       { src: '平面物料/京能项目/主视觉16：9文件.png', title: '京能主视觉' },
       { src: '平面物料/京能项目/安心·场景研判智能体-恢复的 拷贝.png', title: '场景研判智能体' },
       { src: '平面物料/京能项目/电气操作沉浸式体验站.png', title: '电气操作沉浸式体验站' },
       { src: '平面物料/京能项目/脚手架作业沉浸式体验站.png', title: '脚手架作业沉浸式体验站' },
     ]},
-    { project: '企业宣传', images: [
+    { project: '折页', images: [
       { src: '平面物料/天云数据公司简介对折页_印刷版_更新版_01.png', title: '公司简介折页 正面' },
       { src: '平面物料/天云数据公司简介对折页_印刷版_更新版_02.png', title: '公司简介折页 反面' },
-      { src: '平面物料/数字分身平台.png', title: '数字分身平台' },
-      { src: '平面物料/2023资讯快报第一期01 拷贝 2.jpg', title: '资讯快报第一期' },
-      { src: '平面物料/2024科技向未来跨年晚会物料.jpg', title: '跨年晚会物料' },
     ]},
-    { project: '活动物料', images: [
+    { project: '展板', images: [
+      { src: '平面物料/数字分身平台.png', title: '数字分身平台' },
       { src: '平面物料/立牌1.png', title: '立牌设计 01' },
       { src: '平面物料/立牌2.png', title: '立牌设计 02' },
       { src: '平面物料/工作会议1.png', title: '工作会议 01' },
@@ -97,7 +111,9 @@ const PORTFOLIO_DATA = {
       { src: '平面物料/联欢会2.png', title: '联欢会 02' },
       { src: '平面物料/联欢会3.png', title: '联欢会 03' },
     ]},
-    { project: '节日海报', images: [
+    { project: '海报', images: [
+      { src: '平面物料/2023资讯快报第一期01 拷贝 2.jpg', title: '资讯快报第一期' },
+      { src: '平面物料/2024科技向未来跨年晚会物料.jpg', title: '跨年晚会物料' },
       { src: '平面物料/节日海报/1.png', title: '节日海报 01' },
       { src: '平面物料/节日海报/1 (2).png', title: '节日海报 02' },
       { src: '平面物料/节日海报/2.png', title: '节日海报 03' },
@@ -116,8 +132,6 @@ const PORTFOLIO_DATA = {
       { src: '平面物料/节日海报/e43194e9444845c9aed62b70bf3a0ebc~tplv-tb4s082cfz-aigc_resize_2400_2400.png', title: '节日海报 13' },
       { src: '平面物料/节日海报/2024科技向未来跨年晚会物料/5.jpg', title: '跨年晚会 01' },
       { src: '平面物料/节日海报/2024科技向未来跨年晚会物料/6.jpg', title: '跨年晚会 02' },
-    ]},
-    { project: '流言榜项目', images: [
       { src: '平面物料/流言榜项目/流言榜漫画.png', title: '流言榜漫画 01' },
       { src: '平面物料/流言榜项目/流言榜漫画2.png', title: '流言榜漫画 02' },
     ]},
@@ -130,6 +144,74 @@ const CATEGORY_CONFIG = {
   ui:    { title: '界面设计', num: '03', accept: 'image/*', desc: '涵盖官网页面、管理系统与产品平台的界面视觉设计', icon: '▣', hint: '支持 PNG / JPG / SVG 等图片格式' },
   logo:  { title: 'Logo设计', num: '04', accept: 'image/*', desc: '品牌标识设计，涵盖标志创作与视觉应用规范', icon: '◈', hint: '支持 PNG / JPG / SVG 等图片格式' },
 };
+
+function countBuiltIn(cat) {
+  const data = PORTFOLIO_DATA[cat];
+  if (!data) return 0;
+  let count = 0;
+  for (const item of data) {
+    if (item.images) count += item.images.length;
+    else count++;
+  }
+  return count;
+}
+
+function countProjects(cat) {
+  const data = PORTFOLIO_DATA[cat];
+  if (!data) return 0;
+  return data.filter(i => i.project).length || data.length;
+}
+
+async function updateMainPageStats() {
+  const cats = ['video','print','ui','logo'];
+  const builtIn = {};
+  const uploaded = {};
+  let totalBuilt = 0, totalUploaded = 0;
+
+  for (const cat of cats) {
+    builtIn[cat] = countBuiltIn(cat);
+    uploaded[cat] = (await dbGetAll(cat)).length;
+    totalBuilt += builtIn[cat];
+    totalUploaded += uploaded[cat];
+  }
+
+  const total = totalBuilt + totalUploaded;
+
+  const metaNums = document.querySelectorAll('.hero-meta .meta-num');
+  if (metaNums.length >= 3) {
+    metaNums[0].textContent = '04';
+    metaNums[1].textContent = total + '+';
+    metaNums[2].textContent = String(builtIn.video + uploaded.video).padStart(2,'0');
+  }
+
+  const hubCards = document.querySelectorAll('.hub-card');
+  const hubData = [
+    { cat: 'video', label: 'video', built: builtIn.video, up: uploaded.video, sub: '个视频' },
+    { cat: 'print', label: 'print', built: builtIn.print, up: uploaded.print, sub: '个分类' },
+    { cat: 'ui', label: 'ui', built: builtIn.ui, up: uploaded.ui, sub: '个项目' },
+    { cat: 'logo', label: 'logo', built: builtIn.logo, up: uploaded.logo, sub: '' },
+  ];
+  hubCards.forEach((card, i) => {
+    const d = hubData[i];
+    if (!d) return;
+    const meta = card.querySelector('.hub-meta span:first-child');
+    if (meta) {
+      const total = d.built + d.up;
+      if (d.cat === 'video') {
+        const videoCount = PORTFOLIO_DATA.video.filter(v => v.type === 'video').length + d.up;
+        meta.textContent = `${total} 件作品 · ${videoCount} 个视频`;
+      } else if (d.cat === 'print') {
+        const groups = countProjects('print');
+        meta.textContent = `${total} 件作品 · ${groups} 个分类`;
+      } else if (d.cat === 'ui') {
+        const projects = countProjects('ui');
+        meta.textContent = `${total} 件作品 · ${projects} 个项目`;
+      } else {
+        meta.textContent = `${total} 件作品`;
+      }
+    }
+  });
+}
 
 let lightboxImages = [];
 let lightboxIndex = 0;
@@ -264,6 +346,10 @@ function initSubPage(category) {
 
   const uploadBtn = document.getElementById('uploadBtn');
   const dropZone = document.getElementById('dropZone');
+  const subcatSelect = document.getElementById('subcatSelect');
+  if (subcatSelect) populateSubcatSelect(subcatSelect, category);
+
+  const getSelectedSub = () => subcatSelect ? subcatSelect.value : '其他';
 
   uploadBtn.addEventListener('click', () => fileInput.click());
   dropZone.addEventListener('click', () => fileInput.click());
@@ -271,15 +357,12 @@ function initSubPage(category) {
   fileInput.addEventListener('change', async (ev) => {
     const files = Array.from(ev.target.files);
     if (!files.length) return;
+    const sub = getSelectedSub();
     let ok = 0;
-    const subCats = {};
     for (const f of files) {
-      const sub = autoSubcategory(category, f);
-      subCats[sub] = (subCats[sub]||0) + 1;
       try { await dbSave(category, f, sub); ok++; } catch (err) { console.error(err); }
     }
-    const subParts = Object.entries(subCats).map(([k,v]) => `${k} ${v}件`);
-    showToast(`成功上传 ${ok} 个文件：${subParts.join('，')}`);
+    showToast(`成功上传 ${ok} 个文件到「${sub}」`);
     fileInput.value = '';
     await loadUploaded(category);
   });
@@ -293,15 +376,12 @@ function initSubPage(category) {
   dropZone.addEventListener('drop', async (ev) => {
     const files = Array.from(ev.dataTransfer.files);
     if (!files.length) return;
+    const sub = getSelectedSub();
     let ok = 0;
-    const subCats = {};
     for (const f of files) {
-      const sub = autoSubcategory(category, f);
-      subCats[sub] = (subCats[sub]||0) + 1;
       try { await dbSave(category, f, sub); ok++; } catch (err) { console.error(err); }
     }
-    const subParts = Object.entries(subCats).map(([k,v]) => `${k} ${v}件`);
-    showToast(`成功上传 ${ok} 个文件：${subParts.join('，')}`);
+    showToast(`成功上传 ${ok} 个文件到「${sub}」`);
     await loadUploaded(category);
   });
 
@@ -366,7 +446,7 @@ async function loadUploaded(category) {
 
 function renderLogo() {
   const grid = document.getElementById('contentGrid');
-  grid.className = 'grid-3 logo-grid';
+  grid.className = 'grid-2 logo-grid';
   PORTFOLIO_DATA.logo.forEach(item => grid.appendChild(makeCard(item)));
 }
 
@@ -379,7 +459,7 @@ function renderUI() {
     div.className = 'project-group reveal';
     div.innerHTML = `<div class="project-name">${group.project}</div>`;
     const grid = document.createElement('div');
-    grid.className = 'grid-3';
+    grid.className = 'grid-2';
     group.images.forEach(img => grid.appendChild(makeCard(img)));
     div.appendChild(grid);
     container.appendChild(div);
@@ -388,7 +468,7 @@ function renderUI() {
 
 function renderVideo() {
   const container = document.getElementById('contentGrid');
-  container.className = 'grid-3';
+  container.className = 'grid-2';
   PORTFOLIO_DATA.video.forEach(item => {
     if (item.type === 'video') {
       const card = document.createElement('div');
@@ -410,7 +490,7 @@ function renderPrint() {
     div.className = 'print-group reveal';
     div.innerHTML = `<div class="project-name">${group.project}</div>`;
     const masonry = document.createElement('div');
-    masonry.className = 'grid-3';
+    masonry.className = 'grid-2';
     group.images.forEach(img => masonry.appendChild(makeCard(img)));
     div.appendChild(masonry);
     container.appendChild(div);
@@ -444,13 +524,25 @@ function initMainUpload() {
   const dropZone = document.getElementById('mainDropZone');
   if (!fileInput || !uploadBtn) return;
 
+  const mainCatSelect = document.getElementById('mainCatSelect');
+  const mainSubcatSelect = document.getElementById('mainSubcatSelect');
+  if (mainCatSelect) {
+    populateSubcatSelect(mainSubcatSelect, mainCatSelect.value);
+    mainCatSelect.addEventListener('change', () => populateSubcatSelect(mainSubcatSelect, mainCatSelect.value));
+  }
+
+  const getSelected = () => ({
+    cat: mainCatSelect ? mainCatSelect.value : 'print',
+    sub: mainSubcatSelect ? mainSubcatSelect.value : '其他'
+  });
+
   uploadBtn.addEventListener('click', () => fileInput.click());
   if (dropZone) dropZone.addEventListener('click', () => fileInput.click());
 
   fileInput.addEventListener('change', async (ev) => {
     const files = Array.from(ev.target.files);
     if (!files.length) return;
-    await processUploads(files);
+    await processUploads(files, getSelected());
     fileInput.value = '';
   });
 
@@ -464,28 +556,24 @@ function initMainUpload() {
     dropZone.addEventListener('drop', async (ev) => {
       const files = Array.from(ev.dataTransfer.files);
       if (!files.length) return;
-      await processUploads(files);
+      await processUploads(files, getSelected());
     });
   }
 
   loadMainUploads();
+  updateMainPageStats();
 }
 
-async function processUploads(files) {
-  const results = {};
+async function processUploads(files, sel) {
+  const cat = sel ? sel.cat : 'print';
+  const sub = sel ? sel.sub : '其他';
+  let ok = 0;
   for (const f of files) {
-    const cat = autoCategorize(f);
-    const sub = autoSubcategory(cat, f);
-    if (!results[cat]) results[cat] = [];
-    results[cat].push(f.name);
-    try { await dbSave(cat, f, sub); } catch(err) { console.error(err); }
+    try { await dbSave(cat, f, sub); ok++; } catch(err) { console.error(err); }
   }
-  let parts = [];
-  for (const [cat, names] of Object.entries(results)) {
-    parts.push(`${CAT_LABELS[cat]} ${names.length} 件`);
-  }
-  showToast(`自动分类完成：${parts.join('，')}`);
+  showToast(`已上传 ${ok} 个文件到「${CAT_LABELS[cat]} / ${sub}」`);
   await loadMainUploads();
+  await updateMainPageStats();
 }
 
 async function loadMainUploads() {
@@ -544,13 +632,13 @@ async function loadMainUploads() {
     if (imgEl) imgEl.addEventListener('click', () => openLightbox(url, item.name));
     div.querySelector('.delete-btn').addEventListener('click', async (ev) => {
       ev.stopPropagation();
-      try { await dbDelete(item._cat, item.id); URL.revokeObjectURL(url); showToast('已删除'); await loadMainUploads(); }
+      try { await dbDelete(item._cat, item.id); URL.revokeObjectURL(url); showToast('已删除'); await loadMainUploads(); await updateMainPageStats(); }
       catch(err) { showToast('删除失败','error'); }
     });
     div.querySelector('.cat-select').addEventListener('change', async (ev) => {
       const newCat = ev.target.value;
       if (newCat === item._cat) return;
-      try { await dbMoveItem(item.id, item._cat, newCat); showToast(`已移至 ${CAT_LABELS[newCat]}`); await loadMainUploads(); }
+      try { await dbMoveItem(item.id, item._cat, newCat); showToast(`已移至 ${CAT_LABELS[newCat]}`); await loadMainUploads(); await updateMainPageStats(); }
       catch(err) { showToast('移动失败','error'); }
     });
     container.appendChild(div);

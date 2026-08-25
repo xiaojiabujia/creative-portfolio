@@ -56,20 +56,6 @@
   </div>
   <div class="divider"></div>
 
-  <div class="main-upload-section reveal">
-    <div class="main-upload-header">
-      <div class="main-upload-title">上传作品 · 自动分类</div>
-      <div class="upload-summary" id="uploadSummary"></div>
-    </div>
-    <div class="drop-zone main-drop-zone" id="mainDropZone">
-      <div class="drop-icon">&#11014;</div>
-      <div class="drop-text">点击或拖拽文件到此处 <strong>上传作品</strong></div>
-      <div class="drop-subtext">支持图片和视频，系统根据文件名自动分类到视频制作、平面物料、界面设计、Logo设计</div>
-    </div>
-    <div class="upload-grid main-upload-grid" id="mainUploadGrid"></div>
-    <div class="upload-empty" id="mainUploadEmpty">暂无上传作品，点击上方按钮或拖拽文件上传</div>
-  </div>
-
   <div class="hub-cards reveal">
     <a href="video.html" class="hub-card">
       <div class="hub-num">01</div>
@@ -102,6 +88,35 @@
       <div class="hub-desc">品牌标识设计，涵盖标志创作与视觉应用规范，构建品牌核心视觉识别</div>
       <div class="hub-meta"><span>4 件作品</span><span class="arrow">&rarr;</span></div>
     </a>
+  </div>
+
+  <div class="main-upload-section reveal">
+    <div class="main-upload-header">
+      <div class="main-upload-title">上传作品</div>
+      <div class="upload-summary" id="uploadSummary"></div>
+    </div>
+    <div class="upload-select-row">
+      <div class="select-group">
+        <label for="mainCatSelect">大分类</label>
+        <select id="mainCatSelect">
+          <option value="video">视频制作</option>
+          <option value="print" selected>平面物料</option>
+          <option value="ui">界面设计</option>
+          <option value="logo">Logo设计</option>
+        </select>
+      </div>
+      <div class="select-group">
+        <label for="mainSubcatSelect">小分类</label>
+        <select id="mainSubcatSelect"></select>
+      </div>
+    </div>
+    <div class="drop-zone main-drop-zone" id="mainDropZone">
+      <div class="drop-icon">&#11014;</div>
+      <div class="drop-text">点击或拖拽文件到此处 <strong>上传作品</strong></div>
+      <div class="drop-subtext">先选择大分类，再选择对应的小分类，上传后自动归入所选分类</div>
+    </div>
+    <div class="upload-grid main-upload-grid" id="mainUploadGrid"></div>
+    <div class="upload-empty" id="mainUploadEmpty">暂无上传作品，点击上方按钮或拖拽文件上传</div>
   </div>
 </section>
 
