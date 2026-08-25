@@ -622,6 +622,115 @@ footer p { color: var(--text-muted); font-size: 0.85rem; letter-spacing: 0.05em;
 
 .drop-zone .drop-text strong { color: var(--accent-gold); }
 
+/* ===== MAIN PAGE UPLOAD ===== */
+.nav-upload-btn {
+  padding: 8px 18px; font-size: 0.85rem;
+}
+
+.main-upload-section {
+  margin-bottom: 60px; padding: 28px;
+  background: rgba(212,175,55,0.02);
+  border: 1px solid rgba(212,175,55,0.12);
+  border-radius: 20px;
+}
+
+.main-upload-header {
+  display: flex; justify-content: space-between; align-items: center;
+  margin-bottom: 20px; flex-wrap: wrap; gap: 12px;
+}
+
+.main-upload-title {
+  font-size: 1.2rem; font-weight: 700; color: var(--accent-gold);
+}
+
+.upload-summary {
+  display: flex; gap: 8px; flex-wrap: wrap;
+}
+
+.summary-chip {
+  font-size: 0.8rem; color: var(--text-secondary);
+  background: rgba(255,255,255,0.04); padding: 4px 12px;
+  border-radius: 8px; border: 1px solid var(--border-subtle);
+}
+.summary-chip b { color: var(--accent-gold); margin-left: 4px; }
+
+.main-drop-zone {
+  margin-bottom: 24px; padding: 48px 40px;
+}
+
+.main-drop-zone .drop-subtext {
+  color: var(--text-muted); font-size: 0.8rem;
+  margin-top: 8px; max-width: 400px; margin-left: auto; margin-right: auto;
+}
+
+.main-upload-grid {
+  display: grid; grid-template-columns: repeat(4,1fr); gap: 16px;
+}
+
+.main-upload-item {
+  position: relative; border-radius: var(--radius);
+  overflow: hidden; background: var(--bg-card);
+  border: 1px solid var(--border-subtle);
+  transition: var(--transition); display: flex; flex-direction: column;
+}
+.main-upload-item:hover { border-color: var(--border-hover); }
+
+.main-upload-item img, .main-upload-item video {
+  width: 100%; display: block; cursor: pointer;
+  height: 160px; object-fit: cover; background: #111118;
+}
+
+.cat-badge {
+  position: absolute; top: 8px; left: 8px;
+  padding: 3px 10px; border-radius: 6px;
+  font-size: 0.7rem; font-weight: 600; z-index: 5;
+  backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
+  background: rgba(0,0,0,0.6);
+}
+.cat-video { color: var(--accent-cyan); border: 1px solid rgba(0,212,255,0.3); }
+.cat-print { color: var(--accent-gold); border: 1px solid rgba(212,175,55,0.3); }
+.cat-ui    { color: var(--accent-purple); border: 1px solid rgba(124,92,255,0.3); }
+.cat-logo  { color: #4ade80; border: 1px solid rgba(74,222,128,0.3); }
+
+.subcat-badge {
+  position: absolute; top: 8px; right: 40px;
+  padding: 3px 8px; border-radius: 6px;
+  font-size: 0.65rem; z-index: 5;
+  background: rgba(0,0,0,0.5); color: var(--text-secondary);
+  backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
+  border: 1px solid var(--border-subtle);
+}
+
+.upload-sub-group { margin-bottom: 32px; }
+.upload-sub-group:last-child { margin-bottom: 0; }
+.upload-sub-name {
+  font-size: 0.95rem; font-weight: 600; margin-bottom: 12px;
+  padding-left: 12px; border-left: 3px solid var(--accent-gold);
+  color: var(--text-secondary); display: flex; align-items: center; gap: 8px;
+}
+.upload-sub-count {
+  font-size: 0.75rem; color: var(--accent-gold);
+  background: rgba(212,175,55,0.08); padding: 2px 8px; border-radius: 6px;
+}
+.upload-grid-inner {
+  display: grid; grid-template-columns: repeat(3,1fr); gap: 16px;
+}
+
+.cat-select {
+  margin: 0 10px 10px; padding: 6px 8px;
+  background: rgba(255,255,255,0.04); color: var(--text-secondary);
+  border: 1px solid var(--border-subtle); border-radius: 8px;
+  font-size: 0.75rem; font-family: 'Noto Sans SC', sans-serif;
+  cursor: pointer; outline: none;
+}
+.cat-select:focus { border-color: var(--accent-gold); }
+.cat-select option { background: var(--bg-secondary); color: var(--text-primary); }
+
+.upload-more {
+  grid-column: 1 / -1; text-align: center;
+  padding: 20px; color: var(--text-muted); font-size: 0.85rem;
+}
+
 @media (max-width: 900px) {
   nav { padding: 12px 20px; }
   nav ul { display: none; position: absolute; top: 100%; left: 0; right: 0; background: rgba(8,8,12,0.95); flex-direction: column; padding: 12px; gap: 4px; backdrop-filter: blur(20px); border-bottom: 1px solid var(--border-subtle); }
@@ -636,7 +745,8 @@ footer p { color: var(--text-muted); font-size: 0.85rem; letter-spacing: 0.05em;
   .masonry { columns: 1; }
   .hero .hero-meta { flex-direction: column; gap: 16px; }
   .hub-cards { grid-template-columns: 1fr; }
-  .upload-grid { grid-template-columns: 1fr; }
+  .upload-grid, .main-upload-grid, .upload-grid-inner { grid-template-columns: 1fr; }
   .sub-nav { padding: 12px 20px; }
   .upload-btn span:not(.icon) { display: none; }
+  .nav-upload-btn span { display: none; }
 }

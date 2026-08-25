@@ -21,6 +21,13 @@
     <li><a href="ui.html">界面设计</a></li>
     <li><a href="logo.html">Logo设计</a></li>
   </ul>
+  <button class="upload-btn nav-upload-btn" id="mainUploadBtn">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="width:18px;height:18px">
+      <path d="M12 4v12m-5-7l5-5 5 5M4 20h16" stroke-linecap="round" stroke-linejoin="round"/>
+    </svg>
+    <span>上传作品</span>
+  </button>
+  <input type="file" id="mainFileInput" multiple accept="image/*,video/*" style="display:none">
   <button class="nav-toggle" id="navToggle"><span></span><span></span><span></span></button>
 </nav>
 
@@ -48,6 +55,20 @@
     <p class="section-desc">点击进入对应板块，查看完整作品并上传你的创作</p>
   </div>
   <div class="divider"></div>
+
+  <div class="main-upload-section reveal">
+    <div class="main-upload-header">
+      <div class="main-upload-title">上传作品 · 自动分类</div>
+      <div class="upload-summary" id="uploadSummary"></div>
+    </div>
+    <div class="drop-zone main-drop-zone" id="mainDropZone">
+      <div class="drop-icon">&#11014;</div>
+      <div class="drop-text">点击或拖拽文件到此处 <strong>上传作品</strong></div>
+      <div class="drop-subtext">支持图片和视频，系统根据文件名自动分类到视频制作、平面物料、界面设计、Logo设计</div>
+    </div>
+    <div class="upload-grid main-upload-grid" id="mainUploadGrid"></div>
+    <div class="upload-empty" id="mainUploadEmpty">暂无上传作品，点击上方按钮或拖拽文件上传</div>
+  </div>
 
   <div class="hub-cards reveal">
     <a href="video.html" class="hub-card">
@@ -101,6 +122,7 @@
 <script src="assets/app.js"></script>
 <script>
 initCommon();
+initMainUpload();
 
 document.querySelectorAll('.hub-card').forEach(card => {
   card.addEventListener('mousemove', (e) => {

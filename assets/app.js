@@ -1,5 +1,46 @@
 const e = (s) => encodeURIComponent(s).replace(/%2F/g, '/');
 
+function autoCategorize(file) {
+  const name = file.name.toLowerCase();
+  const type = file.type;
+  if (type.startsWith('video/') || /\.(mp4|mov|avi|wmv|flv|webm|mkv|m4v)$/i.test(name)) return 'video';
+  if (/logo|标志|标识|brand.?mark|商标/i.test(name)) return 'logo';
+  if (/ui|界面|画板|页面|screen|mockup|dashboard|管理|系统|平台|招聘|词元|检修/i.test(name)) return 'ui';
+  if (/海报|banner|主视觉|折页|立牌|物料|快报|宣传|活动|节日|圣诞|冬至|立冬|展|背景|联欢|工作会|跨年|流言|漫画/i.test(name)) return 'print';
+  return 'print';
+}
+
+function autoSubcategory(cat, file) {
+  const name = file.name.toLowerCase();
+  if (cat === 'video') {
+    if (/产品|帮手|介绍/.test(name)) return '产品介绍';
+    if (/公司|企业|宣传|形象/.test(name)) return '企业宣传';
+    return '其他视频';
+  }
+  if (cat === 'print') {
+    if (/主视觉|背景|banner|会展/.test(name)) return '品牌主视觉';
+    if (/京能/.test(name)) return '京能项目';
+    if (/折页|简介|快报|数字分身/.test(name)) return '企业宣传';
+    if (/立牌|工作会|联欢|活动/.test(name)) return '活动物料';
+    if (/节日|海报|圣诞|冬至|立冬|跨年/.test(name)) return '节日海报';
+    if (/流言|漫画/.test(name)) return '流言榜项目';
+    return '其他物料';
+  }
+  if (cat === 'ui') {
+    if (/招聘/.test(name)) return '官网招聘页面';
+    if (/检修|管理/.test(name)) return '智能检修管理系统';
+    if (/词元|工厂/.test(name)) return '词元工厂界面设计';
+    return '其他界面';
+  }
+  if (cat === 'logo') {
+    if (/应用|资源|vi|规范/.test(name)) return 'Logo应用';
+    return '标志设计';
+  }
+  return '其他';
+}
+
+const CAT_LABELS = { video: '视频制作', print: '平面物料', ui: '界面设计', logo: 'Logo设计' };
+
 const PORTFOLIO_DATA = {
   logo: [
     { src: 'logo设计/11.png', title: 'Logo设计 01', tag: 'BRAND' },
@@ -136,7 +177,7 @@ function collectAllImages() {
 }
 
 const DB_NAME = 'portfolio_uploads';
-const DB_VERSION = 1;
+const DB_VERSION = 2;
 
 function openDB() {
   return new Promise((resolve, reject) => {
@@ -146,17 +187,24 @@ function openDB() {
       ['logo','ui','video','print'].forEach(s => {
         if (!db.objectStoreNames.contains(s)) db.createObjectStore(s, { keyPath: 'id', autoIncrement: true });
       });
+      if (ev.oldVersion < 2) {
+        ['logo','ui','video','print'].forEach(s => {
+          if (db.objectStoreNames.contains(s)) {
+            try { db.transaction(s, 'readwrite').objectStore(s).createIndex('subcategory', 'subcategory', { unique: false }); } catch(e) {}
+          }
+        });
+      }
     };
     req.onsuccess = () => resolve(req.result);
     req.onerror = () => reject(req.error);
   });
 }
 
-async function dbSave(category, file) {
+async function dbSave(category, file, subcategory) {
   const db = await openDB();
   return new Promise((resolve, reject) => {
     const tx = db.transaction(category, 'readwrite');
-    const req = tx.objectStore(category).add({ file, name: file.name, type: file.type, size: file.size, date: Date.now() });
+    const req = tx.objectStore(category).add({ file, name: file.name, type: file.type, size: file.size, date: Date.now(), subcategory: subcategory || '其他' });
     req.onsuccess = () => resolve(req.result);
     req.onerror = () => reject(req.error);
   });
@@ -224,10 +272,14 @@ function initSubPage(category) {
     const files = Array.from(ev.target.files);
     if (!files.length) return;
     let ok = 0;
+    const subCats = {};
     for (const f of files) {
-      try { await dbSave(category, f); ok++; } catch (err) { console.error(err); }
+      const sub = autoSubcategory(category, f);
+      subCats[sub] = (subCats[sub]||0) + 1;
+      try { await dbSave(category, f, sub); ok++; } catch (err) { console.error(err); }
     }
-    showToast(`成功上传 ${ok} 个文件`);
+    const subParts = Object.entries(subCats).map(([k,v]) => `${k} ${v}件`);
+    showToast(`成功上传 ${ok} 个文件：${subParts.join('，')}`);
     fileInput.value = '';
     await loadUploaded(category);
   });
@@ -242,10 +294,14 @@ function initSubPage(category) {
     const files = Array.from(ev.dataTransfer.files);
     if (!files.length) return;
     let ok = 0;
+    const subCats = {};
     for (const f of files) {
-      try { await dbSave(category, f); ok++; } catch (err) { console.error(err); }
+      const sub = autoSubcategory(category, f);
+      subCats[sub] = (subCats[sub]||0) + 1;
+      try { await dbSave(category, f, sub); ok++; } catch (err) { console.error(err); }
     }
-    showToast(`成功上传 ${ok} 个文件`);
+    const subParts = Object.entries(subCats).map(([k,v]) => `${k} ${v}件`);
+    showToast(`成功上传 ${ok} 个文件：${subParts.join('，')}`);
     await loadUploaded(category);
   });
 
@@ -267,29 +323,45 @@ async function loadUploaded(category) {
   emptyMsg.style.display = 'none';
   if (countBadge) countBadge.textContent = items.length;
 
+  const groups = {};
   items.forEach(item => {
-    const url = URL.createObjectURL(item.file);
-    const isVideo = item.type && item.type.startsWith('video/');
-    const div = document.createElement('div');
-    div.className = 'upload-item';
-    if (isVideo) {
-      div.innerHTML = `<button class="delete-btn" data-id="${item.id}" title="删除">&times;</button><video src="${url}" controls preload="metadata" playsinline></video><div class="upload-item-info"><span class="upload-item-name">${item.name}</span><span class="upload-item-size">${formatSize(item.size)}</span></div>`;
-    } else {
-      div.innerHTML = `<button class="delete-btn" data-id="${item.id}" title="删除">&times;</button><img src="${url}" alt="${item.name}" loading="lazy"><div class="upload-item-info"><span class="upload-item-name">${item.name}</span><span class="upload-item-size">${formatSize(item.size)}</span></div>`;
-      const img = div.querySelector('img');
-      img.addEventListener('click', () => openLightbox(url, item.name));
-    }
-    div.querySelector('.delete-btn').addEventListener('click', async (ev) => {
-      ev.stopPropagation();
-      try {
-        await dbDelete(category, item.id);
-        URL.revokeObjectURL(url);
-        showToast('已删除');
-        await loadUploaded(category);
-      } catch (err) { showToast('删除失败', 'error'); }
-    });
-    container.appendChild(div);
+    const sub = item.subcategory || '其他';
+    if (!groups[sub]) groups[sub] = [];
+    groups[sub].push(item);
   });
+
+  for (const [subName, subItems] of Object.entries(groups)) {
+    const groupDiv = document.createElement('div');
+    groupDiv.className = 'upload-sub-group';
+    groupDiv.innerHTML = `<div class="upload-sub-name">${subName} <span class="upload-sub-count">${subItems.length}</span></div>`;
+    const grid = document.createElement('div');
+    grid.className = 'upload-grid-inner';
+    subItems.forEach(item => {
+      const url = URL.createObjectURL(item.file);
+      const isVideo = item.type && item.type.startsWith('video/');
+      const div = document.createElement('div');
+      div.className = 'upload-item';
+      if (isVideo) {
+        div.innerHTML = `<button class="delete-btn" data-id="${item.id}" title="删除">&times;</button><video src="${url}" controls preload="metadata" playsinline></video><div class="upload-item-info"><span class="upload-item-name">${item.name}</span><span class="upload-item-size">${formatSize(item.size)}</span></div>`;
+      } else {
+        div.innerHTML = `<button class="delete-btn" data-id="${item.id}" title="删除">&times;</button><img src="${url}" alt="${item.name}" loading="lazy"><div class="upload-item-info"><span class="upload-item-name">${item.name}</span><span class="upload-item-size">${formatSize(item.size)}</span></div>`;
+        const img = div.querySelector('img');
+        img.addEventListener('click', () => openLightbox(url, item.name));
+      }
+      div.querySelector('.delete-btn').addEventListener('click', async (ev) => {
+        ev.stopPropagation();
+        try {
+          await dbDelete(category, item.id);
+          URL.revokeObjectURL(url);
+          showToast('已删除');
+          await loadUploaded(category);
+        } catch (err) { showToast('删除失败', 'error'); }
+      });
+      grid.appendChild(div);
+    });
+    groupDiv.appendChild(grid);
+    container.appendChild(groupDiv);
+  }
 }
 
 function renderLogo() {
@@ -343,6 +415,153 @@ function renderPrint() {
     div.appendChild(masonry);
     container.appendChild(div);
   });
+}
+
+async function dbMoveItem(id, fromCat, toCat) {
+  const db = await openDB();
+  return new Promise((resolve, reject) => {
+    const tx = db.transaction([fromCat, toCat], 'readwrite');
+    const getReq = tx.objectStore(fromCat).get(id);
+    getReq.onsuccess = () => {
+      const item = getReq.result;
+      if (!item) { reject(new Error('not found')); return; }
+      delete item.id;
+      const addReq = tx.objectStore(toCat).add(item);
+      addReq.onsuccess = () => {
+        const delReq = tx.objectStore(fromCat).delete(id);
+        delReq.onsuccess = () => resolve(addReq.result);
+        delReq.onerror = () => reject(delReq.error);
+      };
+      addReq.onerror = () => reject(addReq.error);
+    };
+    getReq.onerror = () => reject(getReq.error);
+  });
+}
+
+function initMainUpload() {
+  const fileInput = document.getElementById('mainFileInput');
+  const uploadBtn = document.getElementById('mainUploadBtn');
+  const dropZone = document.getElementById('mainDropZone');
+  if (!fileInput || !uploadBtn) return;
+
+  uploadBtn.addEventListener('click', () => fileInput.click());
+  if (dropZone) dropZone.addEventListener('click', () => fileInput.click());
+
+  fileInput.addEventListener('change', async (ev) => {
+    const files = Array.from(ev.target.files);
+    if (!files.length) return;
+    await processUploads(files);
+    fileInput.value = '';
+  });
+
+  if (dropZone) {
+    ['dragover','dragenter'].forEach(evt => {
+      dropZone.addEventListener(evt, (ev) => { ev.preventDefault(); dropZone.classList.add('dragover'); });
+    });
+    ['dragleave','drop'].forEach(evt => {
+      dropZone.addEventListener(evt, (ev) => { ev.preventDefault(); dropZone.classList.remove('dragover'); });
+    });
+    dropZone.addEventListener('drop', async (ev) => {
+      const files = Array.from(ev.dataTransfer.files);
+      if (!files.length) return;
+      await processUploads(files);
+    });
+  }
+
+  loadMainUploads();
+}
+
+async function processUploads(files) {
+  const results = {};
+  for (const f of files) {
+    const cat = autoCategorize(f);
+    const sub = autoSubcategory(cat, f);
+    if (!results[cat]) results[cat] = [];
+    results[cat].push(f.name);
+    try { await dbSave(cat, f, sub); } catch(err) { console.error(err); }
+  }
+  let parts = [];
+  for (const [cat, names] of Object.entries(results)) {
+    parts.push(`${CAT_LABELS[cat]} ${names.length} 件`);
+  }
+  showToast(`自动分类完成：${parts.join('，')}`);
+  await loadMainUploads();
+}
+
+async function loadMainUploads() {
+  const container = document.getElementById('mainUploadGrid');
+  const emptyMsg = document.getElementById('mainUploadEmpty');
+  const summary = document.getElementById('uploadSummary');
+  if (!container) return;
+
+  const allItems = [];
+  for (const cat of ['video','print','ui','logo']) {
+    const items = await dbGetAll(cat);
+    items.forEach(i => { i._cat = cat; allItems.push(i); });
+  }
+  allItems.sort((a,b) => (b.date||0) - (a.date||0));
+
+  container.innerHTML = '';
+  if (!allItems.length) {
+    emptyMsg.style.display = 'block';
+    if (summary) summary.innerHTML = '';
+    return;
+  }
+  emptyMsg.style.display = 'none';
+
+  if (summary) {
+    const counts = {};
+    for (const cat of ['video','print','ui','logo']) counts[cat] = 0;
+    allItems.forEach(i => counts[i._cat]++);
+    summary.innerHTML = Object.entries(counts).filter(([,v]) => v > 0)
+      .map(([k,v]) => `<span class="summary-chip">${CAT_LABELS[k]} <b>${v}</b></span>`).join('');
+  }
+
+  allItems.slice(0, 12).forEach(item => {
+    const url = URL.createObjectURL(item.file);
+    const isVideo = item.type && item.type.startsWith('video/');
+    const div = document.createElement('div');
+    div.className = 'upload-item main-upload-item';
+    div.innerHTML = `
+      <span class="cat-badge cat-${item._cat}">${CAT_LABELS[item._cat]}</span>
+      <span class="subcat-badge">${item.subcategory || '其他'}</span>
+      <button class="delete-btn" data-id="${item.id}" data-cat="${item._cat}" title="删除">&times;</button>
+      ${isVideo
+        ? `<video src="${url}" controls preload="metadata" playsinline></video>`
+        : `<img src="${url}" alt="${item.name}" loading="lazy">`
+      }
+      <div class="upload-item-info">
+        <span class="upload-item-name">${item.name}</span>
+        <span class="upload-item-size">${formatSize(item.size)}</span>
+      </div>
+      <select class="cat-select" data-id="${item.id}" data-cat="${item._cat}">
+        <option value="video" ${item._cat==='video'?'selected':''}>视频制作</option>
+        <option value="print" ${item._cat==='print'?'selected':''}>平面物料</option>
+        <option value="ui" ${item._cat==='ui'?'selected':''}>界面设计</option>
+        <option value="logo" ${item._cat==='logo'?'selected':''}>Logo设计</option>
+      </select>`;
+    const imgEl = div.querySelector('img');
+    if (imgEl) imgEl.addEventListener('click', () => openLightbox(url, item.name));
+    div.querySelector('.delete-btn').addEventListener('click', async (ev) => {
+      ev.stopPropagation();
+      try { await dbDelete(item._cat, item.id); URL.revokeObjectURL(url); showToast('已删除'); await loadMainUploads(); }
+      catch(err) { showToast('删除失败','error'); }
+    });
+    div.querySelector('.cat-select').addEventListener('change', async (ev) => {
+      const newCat = ev.target.value;
+      if (newCat === item._cat) return;
+      try { await dbMoveItem(item.id, item._cat, newCat); showToast(`已移至 ${CAT_LABELS[newCat]}`); await loadMainUploads(); }
+      catch(err) { showToast('移动失败','error'); }
+    });
+    container.appendChild(div);
+  });
+
+  if (allItems.length > 12) {
+    const more = document.createElement('div');
+    more.className = 'upload-more';
+    more.textContent = `还有 ${allItems.length - 12} 件作品，请到各分类页面查看`;
+    container.appendChild(more);
+  }
 }
 
 function initCommon() {
